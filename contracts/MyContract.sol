@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.7;
+
+// IMPORTS CONTRACTS
+
+// IMPORTS INTERFACES
+
+// IMPORTS LIBRARIES
+
+// ERRORS
+
+// CONTRACT
+contract MyContract {
+    // LIBRARIES USED
+    // STATE VARIABLES
+    // EVENTS
+    // MAPPINGS
+    // MODIFIERS
+    // CONSTRUCTOR
+    // RECEIVE / FALLBACK
+    // MAIN FUNCTIONS
+    // VIEW / PURE FUNCTIONS
+}
