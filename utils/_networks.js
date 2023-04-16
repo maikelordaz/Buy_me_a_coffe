@@ -15,9 +15,6 @@ const networkConfig = {
     31337: {
         name: "hardhat",
     },
-    1: {
-        name: "mainnet_ethereum",
-    },
     5: {
         name: "testnet_goerli",
     },
