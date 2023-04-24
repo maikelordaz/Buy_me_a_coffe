@@ -28,6 +28,8 @@ contract BuyMeACoffe is Ownable {
         string message;
     }
 
+    Coffe[] s_coffes;
+
     /*** EVENTS ***/
     event NewCoffe(address indexed from, uint256 timestamp, string name, string message);
 
@@ -75,7 +77,7 @@ contract BuyMeACoffe is Ownable {
         return s_coffeId;
     }
 
-    function getCoffeById(uint256 id) public view returns (Coffe memory) {
-        return s_coffeById[id];
+    function getCoffes() public view returns (Coffe[] memory) {
+        return s_coffes;
     }
 }
