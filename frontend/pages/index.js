@@ -1,29 +1,43 @@
 import Head from "next/head"
 import styles from "../styles/Home.module.css"
-import Buy from "../components/buy"
-import Footer from "../components/footer"
-import { abi, mumbaiAddress /*, contractAddresses */ } from "../constants"
-//import { useMoralis } from "react-moralis"
+import { abi, mumbaiAddress } from "../constants/index"
+import React, { useEffect, useState } from "react"
+import { ethers } from "ethers"
 import { Toaster } from "react-hot-toast"
-import { useEffect, useState } from "react"
-import React from "react"
-import ethers from "ethers"
+import BuyCoffe from "../components/buyCoffe"
+import Footer from "../components/footer"
 
 export default function Home() {
-    /*
-    const { chainId: chainIdHex } = useMoralis()
-    const chainId = parseInt(chainIdHex)
-    const coffeAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
-    */
+    // Contract Address & ABI
+    //const contractAddress = "0x3FD8878D672C0eD2b225E1abaDA254004e5C6fd1"
+    //const contractABI = abi.abi
 
+    // Component state
     const [currentAccount, setCurrentAccount] = useState("")
     const [name, setName] = useState("")
     const [message, setMessage] = useState("")
+    const [coffees, setCoffees] = useState([])
     const [totalTip, setTotalTip] = useState(0)
-    const [coffes, setCoffes] = useState([])
 
-    // Connect wallet
+    const onNameChange = (event) => {
+        setName(event.target.value)
+    }
+    const onTipChange = (event) => {
+        if (event.target.value > 0) {
+            setTotalTip(event.target.value)
+        } else {
+            setTotalTip(1)
+        }
+    }
+    const coffeePrice = () => {
+        return totalTip * 1
+    }
 
+    const onMessageChange = (event) => {
+        setMessage(event.target.value)
+    }
+
+    // Wallet connection logic
     const isWalletConnected = async () => {
         try {
             const { ethereum } = window
@@ -33,9 +47,9 @@ export default function Home() {
 
             if (accounts.length > 0) {
                 const account = accounts[0]
-                console.log("Wallet connected!" + account)
+                console.log("wallet is connected! " + account)
             } else {
-                console.log("Connect your wallet")
+                console.log("make sure MetaMask is connected")
             }
         } catch (error) {
             console.log("error: ", error)
@@ -48,106 +62,92 @@ export default function Home() {
 
             if (!ethereum) {
                 console.log("Please install Metamask")
-
-                const accounts = await ethereum.request({ method: "ethe_requestAccounts" })
-
-                setCurrentAccount(accounts[0])
             }
+
+            const accounts = await ethereum.request({ method: "eth_requestAccounts" })
+
+            setCurrentAccount(accounts[0])
         } catch (error) {
             console.log(error)
         }
     }
 
-    const onNameChange = (event) => {
-        setName(event.target.value)
-    }
-
-    const onMessageChange = (event) => {
-        setMessage(event.target.value)
-    }
-
-    const onTipChange = (event) => {
-        if (event.target.value > 0) {
-            setTotalTip(event.target.value)
-        } else {
-            setTotalTip(1)
-        }
-    }
-
-    const coffePrice = () => {
-        return totalTip * 0.001
-    }
-
     useEffect(() => {
-        let coffe
+        //const contractABI = abi.abi
+        let buyMeACoffee
         isWalletConnected()
-        //Coffes stored on chain
-        const getCoffes = async () => {
+        // Function to fetch all coffees stored on-chain.
+        const getCoffees = async () => {
             try {
                 const { ethereum } = window
                 if (ethereum) {
                     const provider = new ethers.providers.Web3Provider(ethereum)
                     const signer = provider.getSigner()
-                    const coffe = new ethers.Contract(mumbaiAddress, abi, signer)
+                    const buyMeACoffee = new ethers.Contract(mumbaiAddress, abi, signer)
 
-                    console.log("Fetching coffes on blockchain...")
-                    const coffes = await coffe.getCoffes()
-                    console.log("Done")
-                    setCoffes(coffes)
+                    console.log("fetching coffees from the blockchain..")
+                    const coffees = await buyMeACoffee.getCoffes()
+                    console.log("fetched!")
+                    setCoffees(coffees)
                 } else {
-                    console.log("MetaMAsk not connected")
+                    console.log("MetaMask is not connected")
                 }
             } catch (error) {
                 console.log(error)
             }
-            getCoffes()
-            setName("")
-            setMessage("")
+        }
+        getCoffees()
+        // Clear the form fields.
+        setName("")
+        setMessage("")
 
-            const onNewCoffe = (from, timestamp, name, message) => {
-                console.log("Coffe received: ", from, timestamp, name, messsage)
-                setCoffes((prevState) => [
-                    ...prevState,
-                    {
-                        address: from,
-                        timestamp: new Date(timestamp * 1000),
-                        message,
-                        name,
-                    },
-                ])
-            }
+        // Create an event handler function for when someone sends
+        // us a new coffee.
+        const onNewCoffe = (from, timestamp, name, message) => {
+            console.log("Coffe received: ", from, timestamp, name, message)
+            setCoffees((prevState) => [
+                ...prevState,
+                {
+                    address: from,
+                    timestamp: new Date(timestamp * 1000),
+                    message,
+                    name,
+                },
+            ])
         }
 
         const { ethereum } = window
 
+        // Listen for new coffee events.
         if (ethereum) {
             const provider = new ethers.providers.Web3Provider(ethereum, "any")
             const signer = provider.getSigner()
-            coffe = new ethers.Contract(mumbaiAddress, abi, signer)
+            buyMeACoffee = new ethers.Contract(mumbaiAddress, abi, signer)
 
-            coffe.on("NewCoffe", onNewCoffe)
+            buyMeACoffee.on("NewCoffe", onNewCoffe)
         }
 
         return () => {
-            if (coffe) {
-                coffe.off("NewCoffe", onNewCoffe)
+            if (buyMeACoffee) {
+                buyMeACoffee.off("NewCoffe", onNewCoffe)
             }
         }
     }, [])
-
     return (
         <>
             <div className={styles.container}>
                 <Head>
-                    <title>Buy me a Coffe!</title>
-                    <meta name="dscription" content="Tipping site" />
+                    <title>Buy Maikel a Coffee!</title>
+                    <meta name="description" content="Tipping site" />
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
+
                 <main className={styles.main}>
                     <div>
                         <Toaster />
                     </div>
-                    <h1 className="font/bold text-6xl m-10">Buy Maikel a Coffe!</h1>
+                    <h1 className="font-bold text-6xl m-10">Buy Maikel a Coffee!</h1>
+
                     {currentAccount ? (
                         <div className="flex w-auto flex-col p-10 rounded-xl">
                             <form className="w-full flex flex-col items-center">
@@ -158,18 +158,18 @@ export default function Home() {
                                         className="rounded-md pl-2"
                                         id="name"
                                         type="text"
-                                        placeholder="anon"
+                                        placeholder="Jhon Doe"
                                         onChange={onNameChange}
                                     />
                                 </div>
                                 <br />
                                 <div className="formgroup">
-                                    <label>Give Maikel a message</label>
+                                    <label>Send Maikel a message</label>
                                     <br />
                                     <textarea
                                         className="rounded-md pl-2"
                                         rows={3}
-                                        placeholder="Enjoy this nice coffe"
+                                        placeholder="Enjoy your coffee!"
                                         id="message"
                                         onChange={onMessageChange}
                                         required
@@ -177,7 +177,7 @@ export default function Home() {
                                 </div>
                                 <div className="mt-5">
                                     <h2 className="text-center">
-                                        How many coffe&apos;s do you want to buy
+                                        How many coffee&apos;s do you want to send?
                                     </h2>
                                     <div className="flex justify-center items-center align-center gap-5 mt-5">
                                         <span className="text-5xl">☕</span>
@@ -185,7 +185,7 @@ export default function Home() {
                                             onClick={() => {
                                                 setTotalTip(1)
                                             }}
-                                            className="text-3xl bg-amber-600 rounded-full w-12 h-12 flex items-center justify-center text-white cursor-pointer hover:bg-amber-900"
+                                            className="text-3xl bg-amber-600 rounded-full w-12 h-12 flex items-center justify-center text-white cursor-pointer  hover:bg-amber-900"
                                         >
                                             1
                                         </span>
@@ -193,7 +193,7 @@ export default function Home() {
                                             onClick={() => {
                                                 setTotalTip(3)
                                             }}
-                                            className="text-3xl bg-amber-600 rounded-full w-12 h-12 flex items-center justify-center text-white cursor-pointer hover:bg-amber-900"
+                                            className="text-3xl bg-amber-600 rounded-full w-12 h-12 flex items-center justify-center text-white cursor-pointer  hover:bg-amber-900"
                                         >
                                             3
                                         </span>
@@ -216,12 +216,12 @@ export default function Home() {
                                         ></input>
                                     </div>
                                 </div>
-                                <div className="flex flex'col align'center justify'center">
-                                    <Buy
+                                <div className="flex flex-col align-center justify-center">
+                                    <BuyCoffe
                                         quantity={1}
-                                        coffeType={"Coffe"}
+                                        coffeeType={"Coffee"}
                                         tip={`1 MATIC`}
-                                        price={coffePrice().toString()}
+                                        price={coffeePrice().toString()}
                                         name={name}
                                         message={message}
                                     />
@@ -239,10 +239,10 @@ export default function Home() {
                     )}
                 </main>
 
-                {currentAccount && <h1>Thanks for the coffe!</h1>}
+                {currentAccount && <h1>Coffee received!</h1>}
 
                 {currentAccount &&
-                    coffes.map((coffe, idx) => {
+                    coffees.map((coffee, idx) => {
                         return (
                             <div
                                 key={idx}
@@ -256,11 +256,12 @@ export default function Home() {
                                     placeItems: "center",
                                 }}
                             >
-                                <p className="font-bold">&quot;{coffe.message}&quot;</p>
-                                <p>From: {coffe.name}</p>
+                                <p className="font-bold">&quot;{coffee.message}&quot;</p>
+                                <p>From: {coffee.name}</p>
                             </div>
                         )
                     })}
+
                 <Footer />
             </div>
         </>
