@@ -21,7 +21,7 @@ function BuyCoffe(props) {
                 const buyMeACoffee = new ethers.Contract(mumbaiAddress, abi, signer)
 
                 // Check the size of coffee being purchased and log the action
-                if (props.price === "0.001" || props.price === 0.001) {
+                if (props.price === "1" || props.price === 1) {
                     toast.success("Buying coffee..")
                     console.log("buying coffee..")
                 } else {
@@ -29,9 +29,9 @@ function BuyCoffe(props) {
                     console.log("buying Large coffee..")
                 }
                 // Call the buyCoffee function of the smart contract
-                const coffeTx = await buyMeACoffee.buyCoffee(
+                const coffeTx = await buyMeACoffee.buyCoffe(
                     // Pass the name and message as arguments
-                    props.name ? props.name : "anon",
+                    props.name ? props.name : "Jhon Doe",
                     props.message ? props.message : "Enjoy your coffee!",
                     // Include the price as value
                     { value: ethers.utils.parseEther(props.price) }
@@ -44,7 +44,7 @@ function BuyCoffe(props) {
                 toast.success("mined ", coffeTx.hash)
 
                 // Log the result of the purchase
-                if (props.price === "0.001" || props.price === 0.001) {
+                if (props.price === "1" || props.price === 1) {
                     toast.success("Coffee purchased!")
                     console.log("Coffee purchased!")
                 } else {
@@ -54,11 +54,11 @@ function BuyCoffe(props) {
             }
         } catch (error) {
             // Check if the error was due to the user rejecting the transaction
-            if (error.includes("user rejected transaction")) {
+            /*if (error.includes("user rejected transaction")) {
                 toast.error("User rejected transaction")
-            } else {
+            } else {*/
                 toast.error(error.message)
-            }
+           // }
         }
     }
     return (
