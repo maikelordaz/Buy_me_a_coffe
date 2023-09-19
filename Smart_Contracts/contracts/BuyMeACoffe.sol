@@ -2,7 +2,7 @@
 /// @title BuyMeACoffe
 /// @author Maikel Ordaz
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.18;
 
 /*** IMPORTS CONTRACTS ***/
 import "@openzeppelin/contracts/access/Ownable.sol";
