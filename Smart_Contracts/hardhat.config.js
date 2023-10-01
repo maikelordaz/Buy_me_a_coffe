@@ -19,7 +19,6 @@ const ALICE = "0xa354bAF1c0C42caed01deb672BFA6b66Ef61a8B4"
 
 /******************************************* RPC providers **********************************************/
 const POLYGON_MAINNET_RPC_URL = process.env.POLYGON_MAINNET_RPC_URL
-const GOERLI_TESTNET_RPC_URL = process.env.GOERLI_TESTNET_RPC_URL
 const MUMBAI_TESTNET_RPC_URL = process.env.MUMBAI_TESTNET_RPC_URL
 
 /************************************** Networks Scans *************************************************/
@@ -73,13 +72,6 @@ module.exports = {
             blockConfirmations: 6,
             timeout: 900000,
         },
-        testnet_goerli: {
-            chainId: 5,
-            accounts: [DEPLOYER_PRIVATE_KEY || TESTNET_DEPLOYER_PK],
-            url: GOERLI_TESTNET_RPC_URL,
-            blockConfirmations: 6,
-            timeout: 900000,
-        },
         testnet_mumbai: {
             chainId: 80001,
             accounts: [DEPLOYER_PRIVATE_KEY || TESTNET_DEPLOYER_PK],
@@ -90,7 +82,6 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
-            goerli: ETHERSCAN_API_KEY,
             polygon: POLYGONSCAN_API_KEY,
             polygonMumbai: POLYGONSCAN_API_KEY,
         },
@@ -106,14 +97,14 @@ module.exports = {
         deployer: {
             mainnet_polygon: DEPLOYER,
 
-            testnet_goerli: TESTNET_DEPLOYER,
+          
             testnet_mumbai: TESTNET_DEPLOYER,
 
             default: 0,
             localhost: 0,
         },
         Alice: {
-            testnet_goerli: ALICE,
+          
             testnet_mumbai: ALICE,
 
             default: 1,
