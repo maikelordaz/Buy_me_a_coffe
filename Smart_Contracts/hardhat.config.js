@@ -20,6 +20,7 @@ const ALICE = "0xa354bAF1c0C42caed01deb672BFA6b66Ef61a8B4"
 /******************************************* RPC providers **********************************************/
 const POLYGON_MAINNET_RPC_URL = process.env.POLYGON_MAINNET_RPC_URL
 const MUMBAI_TESTNET_RPC_URL = process.env.MUMBAI_TESTNET_RPC_URL
+// check
 
 /************************************** Networks Scans *************************************************/
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
